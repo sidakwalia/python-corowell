@@ -21,6 +21,20 @@ datetime_NY = datetime.now(tz_NY)
 today = date.today()
 d2 = today.strftime("%B %d, %Y")+" " +str(datetime_NY.strftime("%H:%M:%S"))
 
+@app.route('/api/cornwell/back_end',methods=['POST'])
+def backend():
+    request_data = request.get_json()
+    serial_number=request_data['sn']
+    request_data1=json.dumps(request_data)
+    headers = {
+            'Content-Type': 'application/json'
+            }
+    url="https://backend.fadean.com/ticket/api/list-request?sn="+serial_number+"&ln=en&av=0.1"        
+    final_response=requests.post(url = url, headers=headers, data = request_data1)
+    final_response=json.loads(final_response.text)
+    print(final_response)
+    return final_response
+
 @app.route('/api/cornwell/user_login',methods=['POST'])
 def login():
     try:
