@@ -77,46 +77,21 @@ def register():
 @app.route('/api/cornwell/generate_test_result',methods=['POST'])
 def result():
     try:
-        # request_data = request.get_json()
-        request_data={
-                        "card": {
-                            "ri": "12A3",
-                            "sig": "LTKJEY1T",
-                            "sn": "C120430201F3130112",
-                            "v": 1
-                        },
-                        "userAnswers": {
-                            "scentFeedback": "dill",
-                            "survey": {
-                            "q1": "no",
-                            "q2": "yes",
-                            "q3": "no",
-                            "q4": "no",
-                            "q5": "yes",
-                            "q6": 10,
-                            "q7": "no"
-                            }
-                        },
-                        "userName": "Test User",
-                        "email_id":"rahul@gmail.com"
-                        }
-
+        request_data = request.get_json()
         serial_number=request_data['card']['sn']
         user_name = request_data['userName']
         user_answers=request_data['userAnswers']
         email_id=request_data['email_id']
         user_answers=json.dumps(user_answers)
+        request_data=json.dumps(request_data)
+        headers = {
+            'Content-Type': 'application/json'
+            }
         data=request_data
-        # url="https://backend.fadean.com/ticket/api/result-request?sn="+serial_number+"&ln=en&av=0.1"
-        # final_response=requests.post(url = url, data = data).json()
-        final_response={
-            "awpManifest": None,
-            "awpPassJson": None,
-            "awpSignature": None,
-            "codeMessage": None,
-            "correctScent": "lavender",
-            "status": "fail"
-        }
+        url="https://backend.fadean.com/ticket/api/result-request?sn="+serial_number+"&ln=en&av=0.1"        
+        final_response=requests.post(url = url, headers=headers, data = data)
+        final_response=json.loads(final_response.text)
+        print(final_response)
         covid_results=final_response['status']
         exist_record=db.table('user_login').where('email_id',email_id).first()
         if exist_record!=None:
