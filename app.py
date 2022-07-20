@@ -107,7 +107,7 @@ def result():
         final_response=json.loads(final_response.text)
         print(final_response)
         covid_results=final_response['status']
-        exist_record=db.table('user_login').where('email_id',email_id).first()
+        exist_record=db.table('user_login').where('serial_number',serial_number).first()
         if exist_record!=None:
             updated=db.table('test_details').update({"serial_number",serial_number}).update({"covid_results":covid_results}).update({"survey_answers":user_answers}).where("email_id",email_id)
             if updated==1:
