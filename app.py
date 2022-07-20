@@ -115,7 +115,7 @@ def result():
         else:
             insertion=db.table('test_details').insert({"patient_name":user_name,"serial_number":serial_number,"time_of_test":d2,"survey_answers":user_answers,"covid_results":covid_results,"email_id":email_id})
             if insertion==1:
-                return { "data": "Inserted", "status_code": 200,"covid_result":covid_results}
+                return { "data": "Inserted", "status_code": 200,"covid_result":covid_results,"email_id":email_id,"patient_name":user_name,"time_of_test":d2}
             else:
                 return {"data":"Not inserted","status_code": 400}
     except Exception as e:        
