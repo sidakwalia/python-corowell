@@ -53,18 +53,16 @@ def login():
 def register():
     try:
         request_data = request.get_json()
-        serial_number=request_data['serial_number']
+        # serial_number=request_data['serial_number']
         email_id=request_data['email_id']
         user_name = request_data['user_name']
         password = request_data['password']
         exist_record=db.table('user_login').where('email_id',email_id).first()
-        exist_sn=db.table('user_login').where('serial_number',serial_number).first()
+        # exist_sn=db.table('user_login').where('serial_number',serial_number).first()
         if exist_record!=None:
             return { "data": "user with this email id already exist", "status_code": 200}
-        elif exist_sn!=None:
-            return { "data": "this serial number already used", "status_code": 200}
         else:
-            insertion=db.table('user_login').insert({"user_name":user_name,"password":password,"time":d2,"serial_number":serial_number,"email_id":email_id})
+            insertion=db.table('user_login').insert({"user_name":user_name,"password":password,"time":d2,"email_id":email_id})
             if insertion==1:
                 return { "data": "Updated", "status_code": 200}
             else:
@@ -81,7 +79,7 @@ def result():
                         "card": {
                             "ri": "12A3",
                             "sig": "LTKJEY1T",
-                            "sn": "C120430201F31301s2",
+                            "sn": "C120430201F3130112",
                             "v": 1
                         },
                         "userAnswers": {
