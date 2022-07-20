@@ -24,47 +24,54 @@ def login():
         request_data = request.get_json()
         # Get Account Id
         user_name = request_data['user_name']
+        email_id = request_data['email_id']
+
         # get date range
         password = request_data['password']
-        user_name_exist=db.table('user_login').where('user_name',user_name).first()
-        if user_name_exist!=None:
-            dict_pass=pd.DataFrame(list(db.table('user_login').select('user_name','password').where('user_name',user_name).get())).to_dict()
-            dict_pass=dict_pass['password'][0]
-            if dict_pass==password:
-                exist_insight = db.table('test_details').where('patient_name',user_name).first()
+        email_id_exist=db.table('user_login').where('email_id',email_id).first()
+        if email_id_exist!=None:
+            dict_pass=pd.DataFrame(list(db.table('user_login').select('user_name','password',"email_id").where('email_id',email_id).get())).to_dict()
+            print(dict_pass)
+            password_resonse=dict_pass['password'][0]
+            email_response=dict_pass['email_id'][0]
+            if (password_resonse==password) and (email_id==email_response):
+                print("here")
+                exist_insight = db.table('test_details').where('email_id',email_id).first()
                 if exist_insight!=None:
                     return { "data": "Verified", "status_code": 200,"result":exist_insight}
                 else:
                     return { "data": "Verified", "status_code": 200}
             else:
-                return {"data":"Password is not correct","status_code": 400}
+                return {"data":"Password or email id entered is not correct","status_code": 400}
         else:
             return {"data":"User not found","status_code": 400}
     except Exception as e:        
         print("error is---",str(e))
-        return { "data": "Error", "success": False}
+        return { "data": "Error", "status_code": 400}
 
 @app.route('/api/cornwell/user_registration',methods=['POST'])
 def register():
     try:
         request_data = request.get_json()
-        # Get Account Id
         serial_number=request_data['serial_number']
+        email_id=request_data['email_id']
         user_name = request_data['user_name']
-        # get date range
         password = request_data['password']
-        exist_record = db.table('user_login').where('serial_number',serial_number).first()
+        exist_record=db.table('user_login').where('email_id',email_id).first()
+        exist_sn=db.table('user_login').where('serial_number',serial_number).first()
         if exist_record!=None:
-            return { "data": "user with this serial number already exist", "status_code": 200}
+            return { "data": "user with this email id already exist", "status_code": 200}
+        elif exist_sn!=None:
+            return { "data": "this serial number already used", "status_code": 200}
         else:
-            insertion=db.table('user_login').insert({"user_name":user_name,"password":password,"time":d2,"serial_number":serial_number})
+            insertion=db.table('user_login').insert({"user_name":user_name,"password":password,"time":d2,"serial_number":serial_number,"email_id":email_id})
             if insertion==1:
                 return { "data": "Updated", "status_code": 200}
             else:
                 return {"data":"Not_Updated","status_code": 400}
     except Exception as e:        
         print("error is---",str(e))
-        return { "data": "Error", "success": False}
+        return { "data": "Error", "status_code": 400}
 
 @app.route('/api/cornwell/generate_test_result',methods=['POST'])
 def result():
@@ -74,7 +81,7 @@ def result():
                         "card": {
                             "ri": "12A3",
                             "sig": "LTKJEY1T",
-                            "sn": "C12043001F340",
+                            "sn": "C120430201F31301s2",
                             "v": 1
                         },
                         "userAnswers": {
@@ -89,12 +96,14 @@ def result():
                             "q7": "no"
                             }
                         },
-                        "userName": "Test User"
+                        "userName": "Test User",
+                        "email_id":"rahul@gmail.com"
                         }
 
         serial_number=request_data['card']['sn']
         user_name = request_data['userName']
         user_answers=request_data['userAnswers']
+        email_id=request_data['email_id']
         user_answers=json.dumps(user_answers)
         data=request_data
         # url="https://backend.fadean.com/ticket/api/result-request?sn="+serial_number+"&ln=en&av=0.1"
@@ -108,14 +117,20 @@ def result():
             "status": "fail"
         }
         covid_results=final_response['status']
-        insertion=db.table('test_details').insert({"patient_name":user_name,"serial_number":serial_number,"time_of_test":d2,"survey_answers":user_answers,"covid_results":covid_results})
-        if insertion==1:
-            return { "data": "Updated", "status_code": 200,"result":covid_results}
+        exist_record=db.table('user_login').where('email_id',email_id).first()
+        if exist_record!=None:
+            updated=db.table('test_details').update({"serial_number",serial_number}).update({"covid_results":covid_results}).update({"survey_answers":user_answers}).where("email_id",email_id)
+            if updated==1:
+                return { "data": "Updated", "status_code": 200,"covid_result":covid_results}
         else:
-            return {"data":"Not_Updated","status_code": 400}
+            insertion=db.table('test_details').insert({"patient_name":user_name,"serial_number":serial_number,"time_of_test":d2,"survey_answers":user_answers,"covid_results":covid_results,"email_id":email_id})
+            if insertion==1:
+                return { "data": "Inserted", "status_code": 200,"covid_result":covid_results}
+            else:
+                return {"data":"Not inserted","status_code": 400}
     except Exception as e:        
         print("error is---",str(e))
-        return { "data": "Error", "success": False}
+        return { "data": "serial code is enter already used", "status_code": 400}
     
 if __name__ == '__main__':
     app.run(debug=True,host="0.0.0.0", port=5100)
