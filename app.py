@@ -42,7 +42,6 @@ def login():
         # Get Account Id
         user_name = request_data['user_name']
         email_id = request_data['email_id']
-
         # get date range
         password = request_data['password']
         email_id_exist=db.table('user_login').where('email_id',email_id).first()
@@ -51,9 +50,10 @@ def login():
             print(dict_pass)
             password_resonse=dict_pass['password'][0]
             email_response=dict_pass['email_id'][0]
+            print(email_response)
             if (password_resonse==password) and (email_id==email_response):
                 print("here")
-                exist_insight = db.table('test_details').where('email_id',email_id).first()
+                exist_insight = db.table('test_details').where('email_id',email_response).first()
                 print("here it is",exist_insight)
                 if exist_insight!=None:
                     return { "data": "Verified", "status_code": 200,"result":exist_insight}
@@ -95,8 +95,9 @@ def result():
         request_data = request.get_json()
         serial_number=request_data['card']['sn']
         user_name = request_data['userName']
+        user_name=json.loads(user_name)
         user_answers=request_data['userAnswers']
-        email_id=str(request_data['email_id'])
+        email_id=json.loads(request_data['email_id'])
         user_answers=json.dumps(user_answers)
         print(type(user_answers),"here-----------------",user_answers)
         request_data=json.dumps(request_data)
