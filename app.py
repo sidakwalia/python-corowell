@@ -97,7 +97,7 @@ def result():
         user_name = request_data['userName']
         # user_name=json.loads(user_name)
         user_answers=request_data['userAnswers']
-        email_id=str(request_data['email_id'])
+        email_id=request_data['email_id']
         # email_id=json.loads(email_id)
 
         user_answers=json.dumps(user_answers)
