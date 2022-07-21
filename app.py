@@ -94,6 +94,7 @@ def result():
         request_data = request.get_json()
         serial_number=request_data['card']['sn']
         user_name = request_data['userName']
+        user_name=json.loads(user_name)
         user_answers=request_data['userAnswers']
         email_id=str(request_data['email_id'])
         user_answers=json.dumps(user_answers)
