@@ -54,10 +54,11 @@ def login():
             if (password_resonse==password) and (email_id==email_response):
                 print("here")
                 exist_insight = db.table('test_details').where('email_id',email_id).first()
+                print("here it is",exist_insight)
                 if exist_insight!=None:
                     return { "data": "Verified", "status_code": 200,"result":exist_insight}
                 else:
-                    return { "data": "Verified", "status_code": 200}
+                    return { "data": "Verified", "status_code": 200,"result":exist_insight}
             else:
                 return {"data":"Password or email id entered is not correct","status_code": 400}
         else:
@@ -95,7 +96,7 @@ def result():
         serial_number=request_data['card']['sn']
         user_name = request_data['userName']
         user_answers=request_data['userAnswers']
-        email_id=request_data['email_id']
+        email_id=str(request_data['email_id'])
         user_answers=json.dumps(user_answers)
         print(type(user_answers),"here-----------------",user_answers)
         request_data=json.dumps(request_data)
@@ -123,9 +124,9 @@ def result():
                 return response
         else:
             print("here")
-            insertion=db.table('test_details').insert({"patient_name":user_name,"serial_number":serial_number,"time_of_test":d2,"survey_answers":user_answers,"covid_results":covid_results,"email_id":email_id})
+            insertion=db.table('test_details').insert({"patient_name":user_name,"serial_number":serial_number,"time_of_test":d2,"survey_answers":user_answers,"covid_results":covid_results,"email_id":str(email_id)})
             if insertion==1:
-                response={ "data": "Inserted", "status_code": 200,"covid_results":covid_results,"email_id":email_id,"patient_name":user_name,"time_of_test":d2}
+                response={ "data": "Inserted", "status_code": 200,"covid_results":covid_results,"email_id":str(email_id),"patient_name":user_name,"time_of_test":d2}
                 print(type(response))
                 return response
             else:
