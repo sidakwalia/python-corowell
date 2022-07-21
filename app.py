@@ -103,11 +103,16 @@ def result():
             }
         data=request_data
         url="https://backend.fadean.com/ticket/api/result-request?sn="+serial_number+"&ln=en&av=0.1"        
-        final_response=requests.post(url = url, headers=headers, data = data)
-        final_response=json.loads(final_response.text)
-        print(final_response)
+        try:
+            final_response=requests.post(url = url, headers=headers, data = data)
+            final_response=json.loads(final_response.text)
+            print(final_response)
+        except Exception as e:
+            print("error after response",str(e))
+            return { "data": "serial code is enter already used", "status_code": 400}
         covid_results=final_response['status']
         exist_record=db.table('user_login').where('email_id',email_id).first()
+        print(exist_record)
         if exist_record!=None:
             updated=db.table('test_details').where("email_id",email_id).update({"serial_number":serial_number,"time_of_test":d2,"survey_answers":user_answers})
             if updated==1:
