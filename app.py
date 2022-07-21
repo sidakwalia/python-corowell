@@ -127,9 +127,9 @@ def result():
                 return response
         else:
             print("here")
-            insertion=db.table('test_details').insert({"patient_name":user_name,"serial_number":serial_number,"time_of_test":d2,"survey_answers":user_answers,"covid_results":covid_results,"email_id":str(email_id)})
+            insertion=db.table('test_details').insert({"patient_name":user_name,"serial_number":serial_number,"time_of_test":d2,"survey_answers":user_answers,"covid_results":covid_results,"email_id":email_id})
             if insertion==1:
-                response={ "data": "Inserted", "status_code": 200,"covid_results":covid_results,"email_id":str(email_id),"patient_name":user_name,"time_of_test":d2}
+                response={ "data": "Inserted", "status_code": 200,"covid_results":covid_results,"email_id":email_id,"patient_name":user_name,"time_of_test":d2}
                 print(type(response))
                 return response
             else:
