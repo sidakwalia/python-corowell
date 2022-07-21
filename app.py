@@ -109,24 +109,28 @@ def result():
             print(final_response)
         except Exception as e:
             print("error after response",str(e))
-            return { "data": "serial code is enter already used", "status_code": 400}
+            return { "data": "serial code is enter already used response", "status_code": 400}
         covid_results=final_response['status']
         exist_record=db.table('user_login').where('email_id',email_id).first()
         print(exist_record)
         if exist_record!=None:
             updated=db.table('test_details').where("email_id",email_id).update({"serial_number":serial_number,"time_of_test":d2,"survey_answers":user_answers})
             if updated==1:
-                return { "data": "Updated", "status_code": 200,"covid_results":covid_results,"email_id":email_id,"patient_name":user_name,"time_of_test":d2}
+                response={ "data": "Updated", "status_code": 200,"covid_results":covid_results,"email_id":email_id,"patient_name":user_name,"time_of_test":d2}
+                return json.loads(response)
         else:
             print("here")
             insertion=db.table('test_details').insert({"patient_name":user_name,"serial_number":serial_number,"time_of_test":d2,"survey_answers":user_answers,"covid_results":covid_results,"email_id":email_id})
             if insertion==1:
-                return { "data": "Inserted", "status_code": 200,"covid_results":covid_results,"email_id":email_id,"patient_name":user_name,"time_of_test":d2}
+                response={ "data": "Inserted", "status_code": 200,"covid_results":covid_results,"email_id":email_id,"patient_name":user_name,"time_of_test":d2}
+                return json.loads(response)
             else:
-                return {"data":"Not inserted","status_code": 400}
+                response={"data":"Not inserted","status_code": 400}
+                return json.loads(response)
     except Exception as e:        
         print("error is---",str(e))
-        return { "data": "serial code is enter already used", "status_code": 400}
+        response={ "data": "serial code is enter already used", "status_code": 400}
+        return json.loads(response)
     
 if __name__ == '__main__':
     app.run(debug=True,host="0.0.0.0", port=5100)
