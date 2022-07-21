@@ -97,7 +97,9 @@ def result():
         user_answers=request_data['userAnswers']
         email_id=request_data['email_id']
         user_answers=json.dumps(user_answers)
+        print(type(user_answers),"here-----------------",user_answers)
         request_data=json.dumps(request_data)
+        print(type(request_data),"here after request----------------",request_data)
         headers = {
             'Content-Type': 'application/json'
             }
