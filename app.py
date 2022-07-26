@@ -118,7 +118,7 @@ def register():
                 group_id=generate_unique_id()
                 print("here ---------",group_id)
             db.table('employee_detail').insert(({"company_name":name_org,"address":address,"insurance_flag":insurance_flag,"email_id":email_id,"insurance_number":insurance_number,"insurance_company":insurance_comp,"group_id":group_id,"affilations":affilations,"password":password}))
-            return { "data": "Updated for Admin", "status_code": 200}
+            return { "data": "Updated for Admin", "status_code": 200,"group_id":group_id}
         else: #if it is a user login
             age=request_data['age']
             ethinicity=request_data['ethinicity']
