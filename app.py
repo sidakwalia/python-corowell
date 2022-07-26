@@ -57,7 +57,7 @@ def login():
                         response={"data":results,"success":200,"group_id":group_id}
                         return response
                     else:
-                        return {"data":"Please ask your employees to take a corowell test","success":200}
+                        return {"data":"Please ask your employees to take a corowell test","success":200,"group_id":group_id}
                 else:
                     response={"data":"email_id or password does not match for admin","success":400}
                     return response
