@@ -50,9 +50,10 @@ def login():
                 group_id=admin_detail['group_id']
                 admin_password=admin_detail['password']
                 if (response_pass==admin_password) and (response_email_id==admin_email_id):
-                    group_id_exist=db.table('test_details').where("email_id",admin_email_id).first()
+                    group_id_exist=db.table('test_details').where("group_id",group_id).first()
+                    print("here exist")
                     if group_id_exist!=None:
-                        df=pd.DataFrame(list(db.table('test_details').where("email_id",admin_email_id).get()))
+                        df=pd.DataFrame(list(db.table('test_details').where("group_id",group_id).get()))
                         results=df[['patient_name','time_of_test','covid_results']].to_dict(orient='index')
                         response={"data":results,"status_code":200,"group_id":group_id}
                         return response
