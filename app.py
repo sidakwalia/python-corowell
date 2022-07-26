@@ -54,16 +54,16 @@ def login():
                     if group_id_exist!=None:
                         df=pd.DataFrame(list(db.table('test_details').where("email_id",admin_email_id).get()))
                         results=df[['patient_name','time_of_test','covid_results']].to_dict(orient='index')
-                        response={"data":results,"success":200,"group_id":group_id}
+                        response={"data":results,"status_code":200,"group_id":group_id}
                         return response
                     else:
-                        return {"data":"Please ask your employees to take a corowell test","success":200,"group_id":group_id}
+                        return {"data":"Please ask your employees to take a corowell test","status_code":200,"group_id":group_id}
                 else:
-                    response={"data":"email_id or password does not match for admin","success":400}
+                    response={"data":"email_id or password does not match for admin","status_code":400}
                     return response
             except Exception as e:
                 print("Error in admind= details login--------------------")
-                response={"data":"Error for admin login","success":400}
+                response={"data":"Error for admin login","status_code":400}
                 return response
         elif user_detail!=None:
             try:
@@ -74,16 +74,16 @@ def login():
                     if test_detail!=None:
                         df=pd.DataFrame(list(db.table('test_details').where("email_id",user_email_id).get()))
                         results=df[['patient_name','time_of_test','covid_results']].tail(5).to_dict(orient='index')
-                        response={"data":results,"success":200}
+                        response={"data":results,"status_code":200}
                         return response
                     else:
-                        return {"data":"Please take a corowell test","success":200}
+                        return {"data":"Please take a corowell test","status_code":200}
                 else:
-                    response={"data":"email_id or password does not match for user","success":400}
+                    response={"data":"email_id or password does not match for user","status_code":400}
                     return response
             except Exception as e:
                 print("Error in user details login--------------------")
-                response={"data":"Error for user login","success":400}
+                response={"data":"Error for user login","status_code":400}
                 return response
         else:
             return {"data":"User not found","status_code": 400}
@@ -136,7 +136,7 @@ def register():
                 url="https://backend.fadean.com/ticket/api/user-registration-niander"
                 payload={"age":age,"gender":gender,"ethnicity":ethinicity,"smoking":smoking_status,"insuranceNr":insurance_number,"groupNr":group_id,"lung_disease":disease_details['lungs'],"heart_disease":disease_details['heart'],"liver_disease":disease_details['liver'],"diabetes":disease_details['diabetes'],"autoimmune_disorder":disease_details['autoimmune'],"cancer":disease_details['cancer'],"kidney_disease":disease_details['kidney'],"neurological_disease":disease_details['neurolo'],"address":address,"userid":user_id}
                 res=requests.post(url, data = payload)
-                return {"data":"Sent request to niander database","success":200}
+                return {"data":"Sent request to niander database","status_code":200}
     except Exception as e:        
         print("error is---",str(e))
         return { "data": "Error", "status_code": 400}
