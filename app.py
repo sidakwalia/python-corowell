@@ -81,7 +81,7 @@ def login():
                         response={"data":"Covid result for the patient","status_code":200,"user_name":user_name,"userid":user_id,"test_results":results}
                         return response
                     else:
-                        return {"data":"Please take a corowell test","status_code":200,"user_name":user_name,"userid":user_id,"test_results":results}
+                        return {"data":"Please take a corowell test","status_code":200,"user_name":user_name,"userid":user_id,"test_results":{}}
                 else:
                     response={"data":"email_id or password does not match for user","status_code":400}
                     return response
