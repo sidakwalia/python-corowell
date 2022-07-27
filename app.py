@@ -43,7 +43,7 @@ def login():
         response_email_id=request_data['email_id']
         response_pass = request_data['password']
         admin_detail=db.table('employee_detail').select("email_id","password","group_id").where('email_id',response_email_id).first()
-        user_detail=db.table('employees_details').select("email_id","password","employee_id","name").where('email_id',response_email_id).first()
+        user_detail=db.table('employees_details').select("email_id","password","employee_id","name","group_id").where('email_id',response_email_id).first()
         if admin_detail!=None:
             try:
                 admin_email_id=admin_detail['email_id']
@@ -55,10 +55,10 @@ def login():
                     if group_id_exist!=None:
                         df=pd.DataFrame(list(db.table('test_details').where("group_id",group_id).get()))
                         results=df[['patient_name','time_of_test','covid_results']].to_dict(orient='index')
-                        response={"data":"Covid results for admin for all employees","status_code":200,"group_id":group_id,"test_results":results}
+                        response={"data":"Covid results for admin for all employees","status_code":200,"group_id":group_id,"test_results":results,"user_type":0}
                         return response
                     else:
-                        return {"data":"Please ask your employees to take a corowell test","status_code":200,"group_id":group_id,"test_results":{}}
+                        return {"data":"Please ask your employees to take a corowell test","status_code":200,"group_id":group_id,"test_results":{},"user_type":0}
                 else:
                     response={"data":"email_id or password does not match for admin","status_code":400}
                     return response
@@ -73,15 +73,16 @@ def login():
                 user_password=user_detail['password']
                 user_id=user_detail['employee_id']
                 user_name=user_detail['name']
+                group_id=user_detail['group_id']
                 if (response_pass==user_password) and (response_email_id==user_email_id):
                     test_detail=db.table('test_details').where("email_id",user_email_id).first()
                     if test_detail!=None:
                         df=pd.DataFrame(list(db.table('test_details').where("email_id",user_email_id).get()))
                         results=df[['patient_name','time_of_test','covid_results']].tail(5).to_dict(orient='index')
-                        response={"data":"Covid result for the patient","status_code":200,"user_name":user_name,"userid":user_id,"test_results":results}
+                        response={"data":"Covid result for the patient","status_code":200,"user_name":user_name,"userid":user_id,"test_results":results,"group_id":group_id,"user_type":1}
                         return response
                     else:
-                        return {"data":"Please take a corowell test","status_code":200,"user_name":user_name,"userid":user_id,"test_results":{}}
+                        return {"data":"Please take a corowell test","status_code":200,"user_name":user_name,"userid":user_id,"test_results":{},"group_id":group_id,"user_type":1}
                 else:
                     response={"data":"email_id or password does not match for user","status_code":400}
                     return response
@@ -122,7 +123,7 @@ def register():
                 group_id=generate_unique_id()
                 print("here ---------",group_id)
             db.table('employee_detail').insert(({"company_name":name_org,"address":address,"insurance_flag":insurance_flag,"email_id":email_id,"insurance_number":insurance_number,"insurance_company":insurance_comp,"group_id":group_id,"affilations":affilations,"password":password}))
-            return { "data": "Updated for Admin", "status_code": 200,"group_id":group_id}
+            return { "data": "Updated for Admin", "status_code": 200,"group_id":group_id,"user_type":0}
         else: #if it is a user login
             age=request_data['age']
             ethinicity=request_data['ethinicity']
@@ -140,7 +141,7 @@ def register():
                 url="https://backend.fadean.com/ticket/api/user-registration-niander"
                 payload={"age":age,"gender":gender,"ethnicity":ethinicity,"smoking":smoking_status,"insuranceNr":insurance_number,"groupNr":group_id,"lung_disease":disease_details['lungs'],"heart_disease":disease_details['heart'],"liver_disease":disease_details['liver'],"diabetes":disease_details['diabetes'],"autoimmune_disorder":disease_details['autoimmune'],"cancer":disease_details['cancer'],"kidney_disease":disease_details['kidney'],"neurological_disease":disease_details['neurolo'],"address":address,"userid":user_id}
                 res=requests.post(url, data = payload)
-                return {"data":"Sent request to niander database","status_code":200,"user_name":name,"userid":user_id}
+                return {"data":"Sent request to niander database and user registered","status_code":200,"user_name":name,"userid":user_id,"group_id":group_id,"user_type":1}
     except Exception as e:        
         print("error is---",str(e))
         return { "data": "Error", "status_code": 400}
@@ -150,38 +151,62 @@ def result():
     try:
         request_data = request.get_json()
         serial_number=request_data['card']['sn']
-        user_name = request_data['userName']
-        # user_name=json.loads(user_name)
         user_answers=request_data['userAnswers']
-        email_id=str(request_data['email_id'])
-        # email_id=json.loads(email_id)
         user_answers=json.dumps(user_answers)
-        print(type(user_answers),"here-----------------",user_answers)
-        request_data=json.dumps(request_data)
-        print(type(request_data),"here after request----------------",request_data)
+    #     data=json.dumps(request_data)
         headers = {
-            'Content-Type': 'application/json'
-            }
-        data=request_data
-        url="https://backend.fadean.com/ticket/api/result-request?sn="+serial_number+"&ln=en&av=0.1"        
-        try:
-            final_response=requests.post(url = url, headers=headers, data = data)
-            final_response=json.loads(final_response.text)
-            print(final_response)
-        except Exception as e:
-            print("error after response",str(e))
-            return { "data": "serial code is already used on server", "status_code": 400}
-        covid_results=final_response['status']
-        try:
-            insertion=db.table('test_details').insert({"patient_name":json.loads(user_name),"serial_number":serial_number,"time_of_test":d2,"survey_answers":user_answers,"covid_results":covid_results,"email_id":json.loads(email_id)})
+        'Content-Type': 'application/json'
+        }
+        if "nianderId" in request_data:
+            email_id=str(request_data['email_id'])
+            niander_id=request_data['nianderId']
+            symptoms=request_data['symptoms']
+            group_id=request_data['nianderGroup']
+            data=dict((k, request_data[k]) for k in ['card', 'userAnswers','nianderId','symptoms','nianderGroup']
+                                            if k in request_data)
+            data=json.dumps(data)
+            try:
+                url="https://backend.fadean.com/ticket/api/result-request-niander?sn="+serial_number+"&ln=en&av=0.1"
+                final_response=requests.post(url = url, headers=headers, data = data)
+                final_response=json.loads(final_response.text)
+                print("response from niander-----------",final_response)
+            except Exception as e:
+                print("error after response",str(e))
+                return { "data": "serial code is already used on server niander", "status_code": 400}
+            covid_results=final_response['status']
+            user_detail=db.table('employees_details').select("name","employee_id","email_id").where('email_id',email_id).first()
+            user_name=user_detail['name']
+            user_id=user_detail['employee_id']
+            insertion=db.table('test_details').insert({"serial_number":serial_number,"time_of_test":d2,"survey_answers":json.dumps(user_answers),"covid_results":covid_results,"email_id":email_id,"symptoms":json.dumps(symptoms),"niander_flag":"yes","group_id":group_id,"patient_name":user_name})
             if insertion==1:
-                response={ "data": "Inserted", "status_code": 200,"covid_results":covid_results,"email_id":json.loads(email_id),"patient_name":json.loads(user_name),"time_of_test":d2}
+                response={ "data": "Inserted", "status_code": 200,"covid_results":covid_results,"email_id":email_id,"time_of_test":d2,"patient_name":user_name}
                 return response
-        except Exception as e:
-            print("error is ",str(e))
-            response={"data":"Not inserted","status_code": 400}
-            print(type(response))
-            return response
+            else:
+                return {"data":"Not inserted","status_code": 400}
+        else:
+            data=json.dumps(request_data)
+            user_name=request_data['userName']
+
+            url="https://backend.fadean.com/ticket/api/result-request?sn="+serial_number+"&ln=en&av=0.1"        
+            try:
+                final_response=requests.post(url = url, headers=headers, data = data)
+                final_response=json.loads(final_response.text)
+                print("response from corowell-----------------------",final_response)
+            except Exception as e:
+                print("error after response",str(e))
+                return { "data": "serial code is already used on server corowell", "status_code": 400}
+            covid_results=final_response['status']
+            try:
+                insertion=db.table('test_details').insert({"patient_name":user_name,"serial_number":serial_number,"time_of_test":d2,"survey_answers":user_answers,"covid_results":covid_results,"niander_flag":"no"})
+                print("insertion here-------------------",insertion)
+                if insertion==1:
+                    response={ "data": "Inserted for Corowell", "status_code": 200,"covid_results":covid_results,"patient_name":user_name,"time_of_test":d2}
+                    return response
+                else:
+                    return {"data":"Not inserted for Corowell","status_code": 400}
+            except Exception as e:
+                print("error is ",str(e))
+                return {"data":"Not inserted","status_code": 400}
     except Exception as e:        
         print("error is---",str(e))
         response={ "data": "serial code is enter already used", "status_code": 400}
