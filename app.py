@@ -140,7 +140,7 @@ def register():
                 url="https://backend.fadean.com/ticket/api/user-registration-niander"
                 payload={"age":age,"gender":gender,"ethnicity":ethinicity,"smoking":smoking_status,"insuranceNr":insurance_number,"groupNr":group_id,"lung_disease":disease_details['lungs'],"heart_disease":disease_details['heart'],"liver_disease":disease_details['liver'],"diabetes":disease_details['diabetes'],"autoimmune_disorder":disease_details['autoimmune'],"cancer":disease_details['cancer'],"kidney_disease":disease_details['kidney'],"neurological_disease":disease_details['neurolo'],"address":address,"userid":user_id}
                 res=requests.post(url, data = payload)
-                return {"data":"Sent request to niander database","success":200,"user_name":name,"userid":user_id}
+                return {"data":"Sent request to niander database","status_code":200,"user_name":name,"userid":user_id}
     except Exception as e:        
         print("error is---",str(e))
         return { "data": "Error", "status_code": 400}
