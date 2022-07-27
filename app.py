@@ -55,10 +55,10 @@ def login():
                     if group_id_exist!=None:
                         df=pd.DataFrame(list(db.table('test_details').where("group_id",group_id).get()))
                         results=df[['patient_name','time_of_test','covid_results']].to_dict(orient='index')
-                        response={"data":results,"status_code":200,"group_id":group_id}
+                        response={"data":"Covid results for admin for all employees","status_code":200,"group_id":group_id,"test_results":results}
                         return response
                     else:
-                        return {"data":"Please ask your employees to take a corowell test","status_code":200,"group_id":group_id}
+                        return {"data":"Please ask your employees to take a corowell test","status_code":200,"group_id":group_id,"test_results":{}}
                 else:
                     response={"data":"email_id or password does not match for admin","status_code":400}
                     return response
@@ -78,10 +78,10 @@ def login():
                     if test_detail!=None:
                         df=pd.DataFrame(list(db.table('test_details').where("email_id",user_email_id).get()))
                         results=df[['patient_name','time_of_test','covid_results']].tail(5).to_dict(orient='index')
-                        response={"data":results,"status_code":200,"user_name":user_name,"userid":user_id}
+                        response={"data":"Covid result for the patient","status_code":200,"user_name":user_name,"userid":user_id,"test_results":results}
                         return response
                     else:
-                        return {"data":"Please take a corowell test","status_code":200,"user_name":user_name,"userid":user_id}
+                        return {"data":"Please take a corowell test","status_code":200,"user_name":user_name,"userid":user_id,"test_results":results}
                 else:
                     response={"data":"email_id or password does not match for user","status_code":400}
                     return response
