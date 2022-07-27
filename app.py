@@ -118,7 +118,7 @@ def register():
             exist_record=db.table('employee_detail').where('group_id',group_id).first()
             exist_email=db.table('employee_detail').where('email_id',email_id).first()
             if exist_email!=None:
-                return {"data":"Admin id already exist please login with your email","status_code":200}
+                return {"data":"Admin id already exist please login with your email","status_code":400}
             if exist_record!=None:
                 group_id=generate_unique_id()
                 print("here ---------",group_id)
