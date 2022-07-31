@@ -102,7 +102,7 @@ def register():
         request_data = request.get_json()
         email_id=request_data['email_id']
         password = request_data['password']
-        exist_record=db.table('user_login').where('email_id',email_id).first()
+        # exist_record=db.table('user_login').where('email_id',email_id).first()
         group_admin=request_data['group_admin']
         name=request_data['name']
         age=request_data['age']

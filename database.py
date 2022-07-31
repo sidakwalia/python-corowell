@@ -2,10 +2,10 @@ from orator import DatabaseManager
 config = {
     'mysql': {
         'driver': 'mysql',
-        'host': 'corowell-db.cr2idef2yduw.us-east-2.rds.amazonaws.com',
-        'database': 'sys',
+        'host': 'niander-db1.ccpvcviiepyb.us-east-1.rds.amazonaws.com',
+        'database': 'niander',
         'user': 'admin',
-        'password': 'y!E7P^Q6J4inder',
+        'password': '5RZh12r512ca',
         'prefix': '',
         'charset':'utf8mb4'
     }
