@@ -144,7 +144,7 @@ def register():
                 return {"data":"Sent request to niander database and user registered","status_code":200,"user_name":name,"userid":user_id,"group_id":group_id,"user_type":1}
     except Exception as e:        
         print("error is---",str(e))
-        return { "data": "Error", "status_code": 400}
+        return { "data": "Error in user registration api", "status_code": 400}
 
 @app.route('/api/cornwell/generate_test_result',methods=['POST'])
 def result():
