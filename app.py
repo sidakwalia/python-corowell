@@ -192,6 +192,7 @@ def result():
                 final_response=requests.post(url = url, headers=headers, data = data)
                 final_response=json.loads(final_response.text)
                 print("response from corowell-----------------------",final_response)
+                print("")
             except Exception as e:
                 print("error after response",str(e))
                 return { "data": "serial code is already used on server corowell", "status_code": 400}
